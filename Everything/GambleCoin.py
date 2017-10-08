@@ -1,11 +1,12 @@
-__author__ = 'user 1'
+__author__ = 'blademaw'
 
 from Tkinter import *
-import random, time
+import random
 
 #Creates main window
 
 root = Tk()
+root.title("Gamble Coin 2017")
 root.geometry("640x360")
 
 #Creates class for whole program
@@ -22,7 +23,7 @@ class TkinterWhole(object):
         self.coinFlip = 0
         self.numChecker = 0
         self.totalCoins = 100
-        self.firstItem = 0
+        self.firstItemHave = 0
         self.firstItemRand = 0
 
     def quitApplication(self):
@@ -32,31 +33,31 @@ class TkinterWhole(object):
 
     def newWindow(self):
 
-        self.window = Toplevel(root)    #Create a new toplevel window, as a child of the 'root' window.
+        self.window = Toplevel(root)
         self.window.title("GAME OVER")
         self.window.geometry("200x50")
 
-        self.WelcomeLabel2 = Label(self.window, text = "Game Over!")
+        self.WelcomeLabel2 = Label(self.window, text="Game Over!")
         self.WelcomeLabel2.grid(row = 1, column = 0)
 
         self.closeButton = Button(self.window, text = "okay...", command = self.quitApplication())
         self.closeButton.grid(row=2, column = 0)
 
-    def activateFirst(self):
+    def purchaseFirst(self):
+        if self.firstItemHave == 0:
+            if self.totalCoins > 120:
+                self.firstItemHave = 1
+                print("The user successfully bought the upgrade!")
+                self.totalCoins-=120
+                self.firstItemLabel.config(fg="green") 
+                self.coinAmountLabel.config(text=("Total Coins: "+str(self.totalCoins)))
+                self.scalePicker.config(from_=0.0, to=self.totalCoins)
 
-        if self.totalCoins > 120:
-            self.firstItem = 1
-            print("The user successfully bought the upgrade!")
-            self.totalCoins -= 120
-            self.coinAmountLabel.config(text=("Total Coins: "+str(self.totalCoins)))
-            self.scalePicker.config(from_=0.0, to=self.totalCoins)
-
-        elif self.totalCoins < 120:
-            self.firstItem = 0
-            print("the user cannot afford this item!")
-
+            elif self.totalCoins < 120:
+                self.firstItemHave = 0
+                print("The user is not able to afford this item!")
         else:
-            pass
+            print("The user cannot purchase the update as they already have it.")
 
     def gamble(self):
         
@@ -82,17 +83,17 @@ class TkinterWhole(object):
 
             if self.coinFlip == 0:
                 print("Coinflip Result: Loss")
-                if self.firstItem == 1 and self.firstItemRand == 1:
-                    print("+50%")
-                    self.winOrLose.configure(text="LOSE, but +25%")
+                if self.firstItemHave == 1 and self.firstItemRand == 1:
+                    print("Item Effect: +25% Bonus from Loss")
+                    self.winOrLose.configure(text=("LOSE, but +"+str(self.gambleAmount*0.25)))
                     self.totalCoins -= self.gambleAmount
-                    print("The user had multiplier. current = "+str(self.totalCoins))
+                    print("Total Coins without Multiplier: "+str(self.totalCoins))
                     self.totalCoins += (self.gambleAmount*0.25)
-                    print("The user just gained 25% of gambleAmount. after = "+str(self.totalCoins))
+                    print("Total Coins after Multiplier & Final: "+str(self.totalCoins)+"\n\n")
                 else:
                     self.winOrLose.configure(text="LOSE", fg="red")
                     self.totalCoins -= self.gambleAmount
-                    print("The user now has $"+str(self.coinFlip)+"\n\n")
+                    print("Total Coins: "+str(self.coinFlip)+"\n\n")
 
             # win function
 
@@ -127,7 +128,7 @@ class TkinterWhole(object):
         self.scalePicker = Scale(self.awesomeFrame, from_=0.0, to=self.totalCoins, orient = HORIZONTAL)
         self.scalePicker.grid(row = 2, column = 2)
 
-        self.buyFirstItem = Button(self.awesomeFrame, text = "BUY ($120)", command = self.activateFirst)
+        self.buyFirstItem = Button(self.awesomeFrame, text = "BUY ($120)", command = self.purchaseFirst)
         self.buyFirstItem.grid(row=6, column=0)
 
         self.winOrLose = Label(self.awesomeFrame, text = " ", fg = "red")
@@ -139,8 +140,8 @@ class TkinterWhole(object):
         self.shopLabel = Label(self.awesomeFrame, text = "SHOP:")
         self.shopLabel.grid(row=5, column=1)
 
-        self.firstItem = Label(self.awesomeFrame, text = "If you lose, there is a 50% chance you will get 25% of your coins back.")
-        self.firstItem.grid(row=6, column=2)
+        self.firstItemLabel = Label(self.awesomeFrame, text = "50% chance to gain 25% of gamble when you lose.")
+        self.firstItemLabel.grid(row=6, column=2)
 
 #Main code / code that makes tkinter run
 
