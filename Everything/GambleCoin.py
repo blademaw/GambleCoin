@@ -1,13 +1,13 @@
 __author__ = 'blademaw'
 
 from Tkinter import *
-import random
+import random, sys, os
 
 #Creates main window
 
 root = Tk()
 root.title("Gamble Coin 2017")
-root.geometry("640x360")
+root.geometry("700x360")
 
 #Creates class for whole program
 
@@ -26,9 +26,12 @@ class TkinterWhole(object):
         self.firstItemHave = 0
         self.firstItemRand = 0
 
-    def quitApplication(self):
-        root.destroy
-        window.destroy
+    def quit_program(self):
+        root.destroy()
+
+    def restart_program(self):
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
 
 
     def newWindow(self):
@@ -37,11 +40,11 @@ class TkinterWhole(object):
         self.window.title("GAME OVER")
         self.window.geometry("200x50")
 
-        self.WelcomeLabel2 = Label(self.window, text="Game Over!")
-        self.WelcomeLabel2.grid(row = 1, column = 0)
+        self.closeButton = Button(self.window, text = "Restart", command = self.restart_program)
+        self.closeButton.pack()
 
-        self.closeButton = Button(self.window, text = "okay...", command = self.quitApplication())
-        self.closeButton.grid(row=2, column = 0)
+        self.quitButton = Button(self.window, text = "Quit", command = self.quit_program)
+        self.quitButton.pack()
 
     def purchaseFirst(self):
         if self.firstItemHave == 0:
