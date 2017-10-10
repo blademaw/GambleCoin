@@ -1,4 +1,5 @@
-__author__ = 'blademaw'
+__author__ = 'jackoliver'
+__version__ = "1.0.2"
 
 from Tkinter import *
 import random, sys, os
