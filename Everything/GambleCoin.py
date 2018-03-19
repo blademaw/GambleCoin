@@ -18,6 +18,9 @@ class TkinterWhole(object):
         self.awesomeFrame = Frame(root)
         self.awesomeFrame.pack()
 
+        self.radVal = IntVar()
+        self.varLog = "## LOG OUTPUT ##\n"
+
         self.gambleAmount = 0
         self.coinFlip = 0
         self.numChecker = 0
@@ -56,7 +59,7 @@ class TkinterWhole(object):
                 self.firstItemLabel.config(
                     text="PURCHASED - 50% chance to gain 25% of amount gambled when you lose.")
                 self.coinAmountLabel.config(
-                    text=("Total Coins: $" + str(self.totalCoins)))
+                    text=("total: $" + str(self.totalCoins)))
                 self.scalePicker.config(from_=0.0, to=self.totalCoins)
             elif self.totalCoins < 120:
                 self.firstItemHave = 0
@@ -93,15 +96,15 @@ class TkinterWhole(object):
                     self.winOrLose.configure(
                         text=("LOSE, but +$" + str(self.gambleAmount * 0.25)), fg="red")
                     self.totalCoins -= self.gambleAmount
-                    print("Total Coins without Multiplier: " +
+                    print("total without Multiplier: " +
                           str(self.totalCoins))
                     self.totalCoins += (self.gambleAmount * 0.25)
-                    print("Total Coins after Multiplier & Final: " +
+                    print("total after Multiplier & Final: " +
                           str(self.totalCoins) + "\n\n")
                 else:
                     self.winOrLose.configure(text="LOSE", fg="red")
                     self.totalCoins -= self.gambleAmount
-                    print("Total Coins: $" + str(self.totalCoins) + "\n\n")
+                    print("total: $" + str(self.totalCoins) + "\n\n")
 
             # win function
 
@@ -119,12 +122,62 @@ class TkinterWhole(object):
             else:
                 pass
 
+    # simulate a gamble, used in autoRoll
+
+    def simulateGamble(self, simGamAmount, simRollAmount):
+        # TODO: add a warning that states that if you lose all (and show percentage of losing all) you could go negative balance
+        # TODO: choose to print it with the radio buttons
+        # TODO: put varlog into a file and read it
+
+        self.varLog = "## LOG OUTPUT ##\n"
+        self.gambleAmount = simGamAmount
+        self.rollAmountInit = simRollAmount
+        self.rollAmount = simRollAmount
+
+        while self.totalCoins > 0 and self.rollAmount != 0:
+            self.coinFlip = random.randint(0, 1)
+
+            if self.coinFlip == 0:
+                self.totalCoins -= self.gambleAmount
+                self.varLog += ("Instance " +
+                                str((self.rollAmountInit - self.rollAmount) + 1) + ": Loss of " + str(self.gambleAmount) + ", total at $" + str(self.totalCoins) + "\n")
+            elif self.coinFlip == 1:
+                self.totalCoins += self.gambleAmount
+                self.varLog += ("Instance " +
+                                str((self.rollAmountInit - self.rollAmount) + 1) + ": Gain of " + str(self.gambleAmount) + ", total at $" + str(self.totalCoins) + "\n")
+
+            self.rollAmount -= 1
+
+            if self.totalCoins <= 1:
+                self.newWindow()
+            else:
+                pass
+
+        self.coinAmountLabel.configure(
+            text="Total Coins: $" + str(self.totalCoins))
+        self.scalePicker.configure(from_=0.0, to=self.totalCoins)
+        print(self.varLog)
+
+    # autoroll function
+
     def autoRoll(self, rolls, amount):
-        # still need to make this :P (hardest part)
-        # find number of rolls
-        self.numOfRolls = rolls
-        for x in range(1, (numOfRolls + 1)):
-            gamble()
+        # find number of rolls & amount to gamble; if nothing entered, set as 0
+        try:
+            self.numOfRolls = int(self.numOfRollsVal.get())
+        except ValueError:
+            self.numOfRolls = 0
+        try:
+            self.numOfGamble = int(self.amountGambleVal.get())
+        except ValueError:
+            self.numOfGamble = 0
+
+        if self.numOfGamble > self.totalCoins:
+            print("cannot gamble more than user has")
+        else:
+            self.simulateGamble(self.numOfGamble, self.numOfRolls)
+
+    def clearPrint(self):
+        print("\n" * 100)
 
     def autoRollDisplay(self):
 
@@ -139,24 +192,32 @@ class TkinterWhole(object):
         self.numOfRolls = Label(self.autoWindow, text="Number of Rolls: ")
         self.numOfRolls.pack()
 
-        self.numOfRollsVal = Entry(self.autoWindow, text="10")
+        self.numOfRollsVal = Entry(self.autoWindow, bd=3)
         self.numOfRollsVal.pack()
 
         self.amountGamble = Label(self.autoWindow, text="Amount to gamble: ")
         self.amountGamble.pack()
 
-        self.amountGambleVal = Entry(self.autoWindow, text="50")
+        self.amountGambleVal = Entry(self.autoWindow, bd=3)
         self.amountGambleVal.pack()
 
-        self.radioButtonLog = Radiobutton(
-            self.autoWindow, text="View log", value=1)
-        self.radioButtonLog.pack()
+        self.radioLogTrue = Radiobutton(
+            self.autoWindow, text="View log", variable=self.radVal, value=1)
+        self.radioLogTrue.pack()
+
+        self.radioLogFalse = Radiobutton(
+            self.autoWindow, text="Don't View Log", variable=self.radVal, value=0)
+
+        self.goButton = Button(
+            self.autoWindow, text="Autroll", command=lambda: self.autoRoll(1, 2))
+        self.goButton.pack()
+
+        self.clButton = Button(
+            self.autoWindow, text="clear", command=self.clearPrint)
+        self.clButton.pack()
 
         # self.cancelButton = Button(self.autoWindow, text = "Cancel", command = self.close_window)
         # self.cancelButton.pack()
-
-        # self.goButton = Button(self.autoWindow, text = "Roll", command = self.autoRoll)
-        # self.goButton.pack()
 
     def DisplayAll(self):
 
