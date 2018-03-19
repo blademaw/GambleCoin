@@ -1,7 +1,7 @@
 __author__ = 'jackoliver'
 __version__ = "1.0.2"
 
-from Tkinter import *
+from tkinter import *
 import random
 import sys
 import os
@@ -12,9 +12,7 @@ root.geometry("700x360")
 
 
 class TkinterWhole(object):
-
     def __init__(self, root):
-
         # defining frame, vairable
 
         self.awesomeFrame = Frame(root)
@@ -60,7 +58,6 @@ class TkinterWhole(object):
                 self.coinAmountLabel.config(
                     text=("Total Coins: $" + str(self.totalCoins)))
                 self.scalePicker.config(from_=0.0, to=self.totalCoins)
-
             elif self.totalCoins < 120:
                 self.firstItemHave = 0
                 print("The user is not able to afford this item!")
