@@ -16,7 +16,7 @@ class TkinterWhole(object):
         # defining frame, vairable
 
         self.awesomeFrame = Frame(root)
-        self.awesomeFrame.pack()
+        self.awesomeFrame.grid()
 
         self.radVal = IntVar()
         self.varLog = "## LOG OUTPUT ##\n"
@@ -73,8 +73,8 @@ class TkinterWhole(object):
 
         self.gambleAmount = self.scalePicker.get()
 
-        if self.gambleAmount < 1:
-            print("Gambling < 1 is not allowed.")
+        if self.gambleAmount == 0:
+            print("Gambling 0 is not allowed.")
         else:
             # calculating win/loss
             print("gambled:" + str(self.gambleAmount))
@@ -90,34 +90,24 @@ class TkinterWhole(object):
             # lose function
 
             if self.coinFlip == 0:
-                print("eresult:loss")
                 if self.firstItemHave == 1 and self.firstItemRand == 1:
-                    print("Item Effect: +25% Bonus from Loss")
                     self.winOrLose.configure(
                         text=("LOSE, but +$" + str(self.gambleAmount * 0.25)), fg="red")
-                    self.totalCoins -= self.gambleAmount
-                    print("total without Multiplier: " +
-                          str(self.totalCoins))
-                    self.totalCoins += (self.gambleAmount * 0.25)
-                    print("total after Multiplier & Final: " +
-                          str(self.totalCoins) + "\n\n")
+                    self.totalCoins -= (self.gambleAmount * 0.75)
                 else:
                     self.winOrLose.configure(text="LOSE", fg="red")
                     self.totalCoins -= self.gambleAmount
-                    print("total: $" + str(self.totalCoins) + "\n\n")
 
             # win function
 
             elif self.coinFlip == 1:
-                print("eresult:win")
                 self.winOrLose.configure(text="WIN", fg="green")
                 self.totalCoins += (self.gambleAmount * 2)
-                print("total:$" + str(self.totalCoins) + "\n\n")
             self.coinAmountLabel.configure(
                 text="Total Coins: $" + str(self.totalCoins))
             self.scalePicker.configure(from_=0.0, to=self.totalCoins)
 
-            if self.totalCoins <= 1:
+            if self.totalCoins == 0:
                 self.newWindow()
             else:
                 pass
@@ -127,7 +117,7 @@ class TkinterWhole(object):
     def simulateGamble(self, simGamAmount, simRollAmount):
         # TODO: add a warning that states that if you lose all (and show percentage of losing all) you could go negative balance
         # TODO: choose to print it with the radio buttons
-        # TODO: put varlog into a file and read it
+        # TODO: create a new window with varlog output
 
         self.varLog = "## LOG OUTPUT ##\n"
         self.gambleAmount = simGamAmount
@@ -156,11 +146,15 @@ class TkinterWhole(object):
         self.coinAmountLabel.configure(
             text="Total Coins: $" + str(self.totalCoins))
         self.scalePicker.configure(from_=0.0, to=self.totalCoins)
-        print(self.varLog)
+
+        if self.radVal.get() == 1:
+            print(self.varLog)
+        else:
+            print("user chose not to print varlog\n")
 
     # autoroll function
 
-    def autoRoll(self, rolls, amount):
+    def autoRoll(self):
         # find number of rolls & amount to gamble; if nothing entered, set as 0
         try:
             self.numOfRolls = int(self.numOfRollsVal.get())
@@ -179,45 +173,63 @@ class TkinterWhole(object):
     def clearPrint(self):
         print("\n" * 100)
 
+    def close_window(self):
+        self.autoWindow.destroy()
+
+    # def giveMoney(self):
+    #     self.totalCoins += 100
+    #     self.coinAmountLabel.configure(
+    #         text="Total Coins: $" + str(self.totalCoins))
+    #     self.scalePicker.configure(from_=0.0, to=self.totalCoins)
+
     def autoRollDisplay(self):
 
         self.autoWindow = Toplevel(root)
-        self.autoWindow.title("New Autoroll...")
-        self.autoWindow.geometry("300x500")
+        self.autoWindow.title("New Autoroll")
+        self.autoWindow.geometry("450x400")
+
+        self.autoRollFrame = Frame(self.autoWindow)
+        self.autoRollFrame.grid()
 
         self.topTitle = Label(
-            self.autoWindow, text="Create a new autoroll function:")
-        self.topTitle.pack()
+            self.autoRollFrame, text="Create a new autoroll function:")
+        self.topTitle.grid(row=0, column=1)
 
-        self.numOfRolls = Label(self.autoWindow, text="Number of Rolls: ")
-        self.numOfRolls.pack()
+        self.numOfRolls = Label(self.autoRollFrame, text="Number of Rolls: ")
+        self.numOfRolls.grid(row=1, column=0, pady=2)
 
-        self.numOfRollsVal = Entry(self.autoWindow, bd=3)
-        self.numOfRollsVal.pack()
+        self.numOfRollsVal = Entry(self.autoRollFrame, bd=3)
+        self.numOfRollsVal.grid(row=1, column=1, pady=2)
 
-        self.amountGamble = Label(self.autoWindow, text="Amount to gamble: ")
-        self.amountGamble.pack()
+        self.amountGamble = Label(
+            self.autoRollFrame, text="Amount to gamble: ")
+        self.amountGamble.grid(row=2, column=0, pady=2)
 
-        self.amountGambleVal = Entry(self.autoWindow, bd=3)
-        self.amountGambleVal.pack()
+        self.amountGambleVal = Entry(self.autoRollFrame, bd=3)
+        self.amountGambleVal.grid(row=2, column=1, pady=2)
 
         self.radioLogTrue = Radiobutton(
-            self.autoWindow, text="View log", variable=self.radVal, value=1)
-        self.radioLogTrue.pack()
+            self.autoRollFrame, text="View log", variable=self.radVal, value=1)
+        self.radioLogTrue.grid(row=4, column=1)
 
         self.radioLogFalse = Radiobutton(
-            self.autoWindow, text="Don't View Log", variable=self.radVal, value=0)
+            self.autoRollFrame, text="Don't View Log", variable=self.radVal, value=0)
+        self.radioLogFalse.grid(row=5, column=1)
+        #
+        # self.buttonFrame = Frame(self.autoWindow)
+        # self.buttonFrame.grid
 
         self.goButton = Button(
-            self.autoWindow, text="Autroll", command=lambda: self.autoRoll(1, 2))
-        self.goButton.pack()
+            self.autoRollFrame, text="Autroll", command=self.autoRoll)
+        self.goButton.grid(row=6, column=1, sticky=E, padx=2)
 
-        self.clButton = Button(
-            self.autoWindow, text="clear", command=self.clearPrint)
-        self.clButton.pack()
+        # self.clButton = Button(
+        #     self.autoWindow, text="clear", command=self.clearPrint)
+        # self.clButton.pack()
 
-        # self.cancelButton = Button(self.autoWindow, text = "Cancel", command = self.close_window)
-        # self.cancelButton.pack()
+        self.cancelButton = Button(
+            self.autoRollFrame, text="Back", command=self.close_window)
+        self.cancelButton.grid(row=6, column=1, sticky=W, padx=2)
 
     def DisplayAll(self):
 
@@ -259,10 +271,15 @@ class TkinterWhole(object):
             self.awesomeFrame, text="New Autoroll", command=self.autoRollDisplay)
         self.autoRollButton.pack()
 
+        # self.giftButton = Button(
+        #     self.awesomeFrame, text="give $100", command=self.giveMoney)
+        # self.giftButton.pack()
+
 
 # main code / code that makes tkinter run
 
 tkinterwhole = TkinterWhole(root)
 tkinterwhole.DisplayAll()
+tkinterwhole.autoRollDisplay()
 
 root.mainloop()
