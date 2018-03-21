@@ -77,15 +77,11 @@ class TkinterWhole(object):
             print("Gambling 0 is not allowed.")
         else:
             # calculating win/loss
-            print("gambled:" + str(self.gambleAmount))
             self.coinFlip = random.randint(0, 1)
-            print("bresult:" + str(self.coinFlip))
 
             # calculating multipliers / others
 
             self.firstItemRand = random.randint(0, 1)
-
-            # actual win/lose
 
             # lose function
 
@@ -107,7 +103,7 @@ class TkinterWhole(object):
                 text="Total Coins: $" + str(self.totalCoins))
             self.scalePicker.configure(from_=0.0, to=self.totalCoins)
 
-            if self.totalCoins == 0:
+            if self.totalCoins <= 0:
                 self.newWindow()
             else:
                 pass
@@ -116,10 +112,9 @@ class TkinterWhole(object):
 
     def simulateGamble(self, simGamAmount, simRollAmount):
         # TODO: add a warning that states that if you lose all (and show percentage of losing all) you could go negative balance
-        # TODO: choose to print it with the radio buttons
         # TODO: create a new window with varlog output
 
-        self.varLog = "## LOG OUTPUT ##\n"
+        self.varLog = "## LOG OUTPUT ##\n\n"
         self.gambleAmount = simGamAmount
         self.rollAmountInit = simRollAmount
         self.rollAmount = simRollAmount
@@ -130,15 +125,15 @@ class TkinterWhole(object):
             if self.coinFlip == 0:
                 self.totalCoins -= self.gambleAmount
                 self.varLog += ("Instance " +
-                                str((self.rollAmountInit - self.rollAmount) + 1) + ": Loss of " + str(self.gambleAmount) + ", total at $" + str(self.totalCoins) + "\n")
+                                str((self.rollAmountInit - self.rollAmount) + 1) + ": -$" + str(self.gambleAmount) + ", total of $" + str(self.totalCoins) + "\n")
             elif self.coinFlip == 1:
                 self.totalCoins += self.gambleAmount
                 self.varLog += ("Instance " +
-                                str((self.rollAmountInit - self.rollAmount) + 1) + ": Gain of " + str(self.gambleAmount) + ", total at $" + str(self.totalCoins) + "\n")
+                                str((self.rollAmountInit - self.rollAmount) + 1) + ": +$" + str(self.gambleAmount) + ", total of $" + str(self.totalCoins) + "\n")
 
             self.rollAmount -= 1
 
-            if self.totalCoins <= 1:
+            if self.totalCoins <= 0:
                 self.newWindow()
             else:
                 pass
@@ -148,7 +143,7 @@ class TkinterWhole(object):
         self.scalePicker.configure(from_=0.0, to=self.totalCoins)
 
         if self.radVal.get() == 1:
-            print(self.varLog)
+            self.varLogDisplay()
         else:
             print("user chose not to print varlog\n")
 
@@ -181,6 +176,21 @@ class TkinterWhole(object):
     #     self.coinAmountLabel.configure(
     #         text="Total Coins: $" + str(self.totalCoins))
     #     self.scalePicker.configure(from_=0.0, to=self.totalCoins)
+
+    def varLogDisplay(self):
+
+        self.varWindow = Toplevel(self.autoWindow)
+        self.varWindow.title("Log Output")
+        self.varWindow.geometry("250x400")
+
+        self.varFrame = Frame(self.varWindow)
+        self.varFrame.pack()
+
+        self.varText = Text(
+            self.varFrame, bd=4, width=220, borderwidth=0)
+        self.varText.pack()
+
+        self.varText.insert(INSERT, self.varLog)
 
     def autoRollDisplay(self):
 
@@ -280,6 +290,5 @@ class TkinterWhole(object):
 
 tkinterwhole = TkinterWhole(root)
 tkinterwhole.DisplayAll()
-tkinterwhole.autoRollDisplay()
 
 root.mainloop()
