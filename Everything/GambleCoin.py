@@ -16,7 +16,7 @@ class TkinterWhole(object):
         # defining frame, vairable
 
         self.awesomeFrame = Frame(root)
-        self.awesomeFrame.grid()
+        self.awesomeFrame.pack()
 
         self.radVal = IntVar()
         self.varLog = "## LOG OUTPUT ##\n"
@@ -27,6 +27,8 @@ class TkinterWhole(object):
         self.totalCoins = 100
         self.firstItemHave = 0
         self.firstItemRand = 0
+        self.initAmount = 0
+        self.finalAmount = 0
 
     def quit_program(self):
         root.destroy()
@@ -34,6 +36,24 @@ class TkinterWhole(object):
     def restart_program(self):
         python = sys.executable
         os.execl(python, python, * sys.argv)
+
+    def profWinclose(self):
+        self.profWin.destroy()
+
+    def profitWindow(self):
+        self.profWin = Toplevel(root)
+        self.profWin.title("Earnings / Losses")
+        self.profWin.geometry("300x50")
+
+        if self.finalAmount > self.initAmount:
+            (Label(self.profWin, text=("You've made a profit of $"+str((self.finalAmount-self.initAmount))+"! Congratulations!"))).pack()
+        elif self.initAmount > self.finalAmount:
+            (Label(self.profWin, text=("You've lost $"+str((self.initAmount-self.finalAmount))+"."))).pack()
+        else:
+            (Label(self.profWin, text="You didn't make or lose any money!")).pack()
+
+        self.profClose = Button(self.profWin, text="Dismiss", command = self.profWinclose)
+        self.profClose.pack()
 
     def newWindow(self):
 
@@ -114,6 +134,8 @@ class TkinterWhole(object):
         # TODO: add a warning that states that if you lose all (and show percentage of losing all) you could go negative balance
         # TODO: create a new window with varlog output
 
+        self.initAmount = self.totalCoins
+
         self.varLog = "## LOG OUTPUT ##\n\n"
         self.gambleAmount = simGamAmount
         self.rollAmountInit = simRollAmount
@@ -142,10 +164,16 @@ class TkinterWhole(object):
             text="Total Coins: $" + str(self.totalCoins))
         self.scalePicker.configure(from_=0.0, to=self.totalCoins)
 
+        self.finalAmount = self.totalCoins
+
         if self.radVal.get() == 1:
             self.varLogDisplay()
+            print("chose to show varlog, initial amount is %s and final is %s." % (self.initAmount, self.finalAmount))
+            self.profitWindow()
         else:
             print("user chose not to print varlog\n")
+            self.profitWindow()
+
 
     # autoroll function
 
@@ -181,7 +209,7 @@ class TkinterWhole(object):
 
         self.varWindow = Toplevel(self.autoWindow)
         self.varWindow.title("Log Output")
-        self.varWindow.geometry("250x400")
+        self.varWindow.geometry("280x400")
 
         self.varFrame = Frame(self.varWindow)
         self.varFrame.pack()
