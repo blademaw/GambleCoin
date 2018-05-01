@@ -19,6 +19,7 @@ class TkinterWhole(object):
         self.awesomeFrame.pack()
 
         self.radVal = IntVar()
+        self.checkVal = IntVar()
         self.varLog = "## LOG OUTPUT ##\n"
 
         self.gambleAmount = 0
@@ -43,7 +44,7 @@ class TkinterWhole(object):
     def profitWindow(self):
         self.profWin = Toplevel(root)
         self.profWin.title("Earnings / Losses")
-        self.profWin.geometry("300x50")
+        self.profWin.geometry("330x50")
 
         if self.finalAmount > self.initAmount:
             (Label(self.profWin, text=("You've made a profit of $"+str((self.finalAmount-self.initAmount))+"! Congratulations!"))).pack()
@@ -169,10 +170,15 @@ class TkinterWhole(object):
         if self.radVal.get() == 1:
             self.varLogDisplay()
             print("chose to show varlog, initial amount is %s and final is %s." % (self.initAmount, self.finalAmount))
+            if self.checkVal.get() == 1:
+                self.profitWindow()
+            else:
+                pass
+        elif self.checkVal.get() == 1:
+            print("user chose not to print varlog\nuser chose to print profitwin\n")
             self.profitWindow()
         else:
-            print("user chose not to print varlog\n")
-            self.profitWindow()
+            pass
 
 
     # autoroll function
@@ -189,7 +195,9 @@ class TkinterWhole(object):
             self.numOfGamble = 0
 
         if self.numOfGamble > self.totalCoins:
-            print("cannot gamble more than user has")
+            print("cannot gamble more than user has or has inputted 0.\n")
+        elif self.numOfRolls <= 0 or self.numOfGamble <= 0:
+            print("inputted <=0 for one or both of self.numOfRolls / self.numOfGamble.\n")
         else:
             self.simulateGamble(self.numOfGamble, self.numOfRolls)
 
@@ -199,17 +207,19 @@ class TkinterWhole(object):
     def close_window(self):
         self.autoWindow.destroy()
 
-    # def giveMoney(self):
-    #     self.totalCoins += 100
-    #     self.coinAmountLabel.configure(
-    #         text="Total Coins: $" + str(self.totalCoins))
-    #     self.scalePicker.configure(from_=0.0, to=self.totalCoins)
+# give money
+
+    def giveMoney(self):
+        self.totalCoins += 100
+        self.coinAmountLabel.configure(
+            text="Total Coins: $" + str(self.totalCoins))
+        self.scalePicker.configure(from_=0.0, to=self.totalCoins)
 
     def varLogDisplay(self):
 
         self.varWindow = Toplevel(self.autoWindow)
         self.varWindow.title("Log Output")
-        self.varWindow.geometry("280x400")
+        self.varWindow.geometry("300x400")
 
         self.varFrame = Frame(self.varWindow)
         self.varFrame.pack()
@@ -253,13 +263,17 @@ class TkinterWhole(object):
         self.radioLogFalse = Radiobutton(
             self.autoRollFrame, text="Don't View Log", variable=self.radVal, value=0)
         self.radioLogFalse.grid(row=5, column=1)
+
+        self.checkProfitMargin = Checkbutton(self.autoRollFrame, text="View Profit/Loss Margin", variable=self.checkVal)
+        self.checkProfitMargin.grid(row=6, column=1)
+
         #
         # self.buttonFrame = Frame(self.autoWindow)
         # self.buttonFrame.grid
 
         self.goButton = Button(
             self.autoRollFrame, text="Autroll", command=self.autoRoll)
-        self.goButton.grid(row=6, column=1, sticky=E, padx=2)
+        self.goButton.grid(row=7, column=1, sticky=E, padx=2)
 
         # self.clButton = Button(
         #     self.autoWindow, text="clear", command=self.clearPrint)
@@ -267,7 +281,7 @@ class TkinterWhole(object):
 
         self.cancelButton = Button(
             self.autoRollFrame, text="Back", command=self.close_window)
-        self.cancelButton.grid(row=6, column=1, sticky=W, padx=2)
+        self.cancelButton.grid(row=7, column=1, sticky=W, padx=2)
 
     def DisplayAll(self):
 
@@ -309,9 +323,9 @@ class TkinterWhole(object):
             self.awesomeFrame, text="New Autoroll", command=self.autoRollDisplay)
         self.autoRollButton.pack()
 
-        # self.giftButton = Button(
-        #     self.awesomeFrame, text="give $100", command=self.giveMoney)
-        # self.giftButton.pack()
+        self.giftButton = Button(
+            self.awesomeFrame, text="give $100", command=self.giveMoney)
+        self.giftButton.pack()
 
 
 # main code / code that makes tkinter run
